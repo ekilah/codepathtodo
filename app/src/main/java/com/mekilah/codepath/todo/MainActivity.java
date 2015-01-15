@@ -96,6 +96,7 @@ public class MainActivity extends ActionBarActivity {
         EditText et = (EditText) findViewById(R.id.etNewItem);
         itemsAdapter.add(et.getText().toString());
         et.setText("");
+        writeFile();
     }
 
     private void readFile(){
