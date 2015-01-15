@@ -4,7 +4,10 @@ import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
 
 import java.util.ArrayList;
@@ -29,8 +32,19 @@ public class MainActivity extends ActionBarActivity {
 
         items.add("first item");
         items.add("second item");
+
+        this.setupListViewListener();
     }
 
+    private void setupListViewListener(){
+        this.lvItems.setOnItemLongClickListener( new AdapterView.OnItemLongClickListener() {
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                items.remove(position);
+                itemsAdapter.notifyDataSetChanged();
+                return true;
+            }
+        });
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -52,5 +66,11 @@ public class MainActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void onAddItem(View v){
+        EditText et = (EditText) findViewById(R.id.etNewItem);
+        itemsAdapter.add(et.getText().toString());
+        et.setText("");
     }
 }

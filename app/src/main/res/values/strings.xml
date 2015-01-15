@@ -4,6 +4,6 @@
     <string name="app_name">Todo</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
-    <string name="addItem">Add Item</string>
+    <string name="addItem">Add Item!</string>
 
 </resources>
