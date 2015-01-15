@@ -3,16 +3,16 @@ This is a project to demonstrate my awesome skills to @codepath in order to enro
 
 I spent only an hour or so on this so far.
 
-As of c3ce3e1671e1cd2a0b19787a2db26d46fbf34004 the required sections are complete. checklist:
+As of `c3ce3e1671e1cd2a0b19787a2db26d46fbf34004` the required sections are complete. checklist:
 - [x] code
   - [x] successfully add and remove items
   - [x] editing feature
   - [x] file persistence
-- [ ] git(hub) 
+- [x] git(hub) 
   - [x] pushed 
   - [x] readme
   - [x] gif
-  - [ ] issue
+  - [x] issue
 
 I will add to this project before the training as I have free time (if/when!)
 
