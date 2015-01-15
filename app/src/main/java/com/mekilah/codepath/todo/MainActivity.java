@@ -1,5 +1,6 @@
 package com.mekilah.codepath.todo;
 
+import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -18,7 +19,8 @@ import java.util.ArrayList;
 
 
 public class MainActivity extends ActionBarActivity {
-    
+    private final int MY_RESULT_CODE = 42;
+
     ListView lvItems;
     ArrayList<String> items;
     ArrayAdapter<String> itemsAdapter;
@@ -34,10 +36,10 @@ public class MainActivity extends ActionBarActivity {
 
         lvItems.setAdapter(itemsAdapter);
 
-        this.setupListViewListener();
+        this.setupListViewListeners();
     }
 
-    private void setupListViewListener(){
+    private void setupListViewListeners(){
         this.lvItems.setOnItemLongClickListener( new AdapterView.OnItemLongClickListener() {
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                 items.remove(position);
@@ -46,6 +48,26 @@ public class MainActivity extends ActionBarActivity {
                 return true;
             }
         });
+
+        this.lvItems.setOnItemClickListener( new AdapterView.OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent i = new Intent(MainActivity.this, EditActivity.class);
+                i.putExtra("pos", position);
+                i.putExtra("text", items.get(position));
+                startActivityForResult(i, MY_RESULT_CODE);
+            }
+        });
+    }
+
+    public void onActivityResult(int requestCode, int resultCode, Intent data){
+        if(requestCode == this.MY_RESULT_CODE){
+            if(resultCode == RESULT_OK){
+                int position = data.getExtras().getInt("pos", -1);
+                items.set(position, data.getExtras().getString("text").toString());
+                itemsAdapter.notifyDataSetChanged();
+                writeFile();
+            }
+        }
     }
 
     @Override
