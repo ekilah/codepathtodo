@@ -10,11 +10,15 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 
+import org.apache.commons.io.FileUtils;
+
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
 
 public class MainActivity extends ActionBarActivity {
-
+    
     ListView lvItems;
     ArrayList<String> items;
     ArrayAdapter<String> itemsAdapter;
@@ -25,13 +29,10 @@ public class MainActivity extends ActionBarActivity {
         setContentView(R.layout.activity_main);
 
         lvItems = (ListView) findViewById(R.id.lvItems);
-        items = new ArrayList<String>();
+        readFile();
         itemsAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, items);
 
         lvItems.setAdapter(itemsAdapter);
-
-        items.add("first item");
-        items.add("second item");
 
         this.setupListViewListener();
     }
@@ -41,6 +42,7 @@ public class MainActivity extends ActionBarActivity {
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                 items.remove(position);
                 itemsAdapter.notifyDataSetChanged();
+                writeFile();
                 return true;
             }
         });
@@ -72,5 +74,25 @@ public class MainActivity extends ActionBarActivity {
         EditText et = (EditText) findViewById(R.id.etNewItem);
         itemsAdapter.add(et.getText().toString());
         et.setText("");
+    }
+
+    private void readFile(){
+        File file = new File(getFilesDir(), "todo.txt");
+
+        try{
+            items = new ArrayList<String>(FileUtils.readLines(file));
+        }catch(Exception e){
+            items = new ArrayList<String>();
+        }
+    }
+
+    private void writeFile(){
+        File file = new File(getFilesDir(), "todo.txt");
+
+        try {
+            FileUtils.writeLines(file, items);
+        }catch(IOException e){
+            e.printStackTrace();
+        }
     }
 }
