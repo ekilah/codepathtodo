@@ -93,7 +93,9 @@ public class MainActivity extends ActionBarActivity implements AddOrEditFragment
 
         this.lvItems.setOnItemClickListener( new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
+                FragmentManager fragmentManager = getSupportFragmentManager();
+                AddOrEditFragment addFragment = AddOrEditFragment.newInstance("Edit Todo item", items.get(position), position);
+                addFragment.show(fragmentManager, "fragment_edit");
             }
         });
     }
@@ -135,7 +137,6 @@ public class MainActivity extends ActionBarActivity implements AddOrEditFragment
             for(String s : strings){
                 int pos = s.lastIndexOf(" ");
                 AddOrEditFragment.AddOrEditFragmentData data = new AddOrEditFragment.AddOrEditFragmentData();
-                Log.w("read", "position of last space: " + pos + ". string length: " + s.length());
                 boolean success = data.setDateFromString(s.substring(pos+1 /*don't include space*/));
 
                 if(!success){
@@ -150,7 +151,7 @@ public class MainActivity extends ActionBarActivity implements AddOrEditFragment
             e.printStackTrace();
             Log.e("err", "file read failed.", e);
             items = new ArrayList<AddOrEditFragment.AddOrEditFragmentData>();
-            //writeFile();
+            writeFile(); //delete bad file contents on bad read
         }
     }
 
@@ -165,8 +166,16 @@ public class MainActivity extends ActionBarActivity implements AddOrEditFragment
     }
 
     @Override
-    public void onAcceptPressedInAddOrEditFragment(AddOrEditFragment.AddOrEditFragmentData data) {
-        itemsAdapter.add(data);
+    public void onAcceptPressedInAddOrEditFragment(AddOrEditFragment.AddOrEditFragmentData data, int position) {
+        if(position > -1 && position < items.size()){
+            items.set(position, data);
+            itemsAdapter.notifyDataSetChanged();
+        }else{
+            if(position != -1){
+                Log.e("mainactivity", "bad position passed back from AddOrEditFragment: " + position + ", writing new item instead.");
+            }
+            itemsAdapter.add(data);
+        }
         writeFile();
     }
 }

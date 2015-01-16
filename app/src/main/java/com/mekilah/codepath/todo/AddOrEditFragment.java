@@ -20,7 +20,7 @@ public class AddOrEditFragment extends DialogFragment {
     public AddOrEditFragment(){}
 
     public interface AddOrEditFragmentAcceptedListener{
-        public void onAcceptPressedInAddOrEditFragment(AddOrEditFragmentData data);
+        public void onAcceptPressedInAddOrEditFragment(AddOrEditFragmentData data, int position);
     }
 
     public static class AddOrEditFragmentData implements Serializable{
@@ -90,9 +90,15 @@ public class AddOrEditFragment extends DialogFragment {
     }
 
     public static AddOrEditFragment newInstance(String title){
+        return AddOrEditFragment.newInstance(title, null, -1);
+    }
+
+    public static AddOrEditFragment newInstance(String title, AddOrEditFragmentData data, int position){
         AddOrEditFragment frag = new AddOrEditFragment();
         Bundle args = new Bundle();
         args.putString("title", title);
+        args.putSerializable("data", data);
+        args.putInt("pos", position);
         frag.setArguments(args);
         return frag;
     }
@@ -101,8 +107,17 @@ public class AddOrEditFragment extends DialogFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
         View view = inflater.inflate(R.layout.fragment_add_or_edit_item, container);
         getDialog().setTitle(getArguments().getString("title", "Add or edit item"));
+
         final EditText etItemName = (EditText) view.findViewById(R.id.etFragAddOrEditItemName);
         etItemName.requestFocus();
+        final int position = getArguments().getInt("pos", -1);
+
+        AddOrEditFragmentData data = (AddOrEditFragmentData) getArguments().get("data"); //if not null, we are editing an item. get current values
+        if(data != null){
+            DatePicker dp = (DatePicker) view.findViewById(R.id.dpAddOrEditDatePicker);
+            dp.updateDate(data.year, data.month-1, data.dayOfMonth);
+            etItemName.setText(data.name);
+        }
 
         Button btnCancel = (Button) view.findViewById(R.id.btnCancel);
         btnCancel.setOnClickListener(new View.OnClickListener() {
@@ -121,7 +136,7 @@ public class AddOrEditFragment extends DialogFragment {
                 DatePicker datePicker = (DatePicker) getDialog().findViewById(R.id.dpAddOrEditDatePicker);
                 AddOrEditFragmentData data = new AddOrEditFragmentData(etItemName.getText().toString(), datePicker);
                 AddOrEditFragmentAcceptedListener listener = (AddOrEditFragmentAcceptedListener) getActivity();
-                listener.onAcceptPressedInAddOrEditFragment(data);
+                listener.onAcceptPressedInAddOrEditFragment(data, position);
                 getDialog().dismiss();
             }
         });
