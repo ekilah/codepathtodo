@@ -1,6 +1,7 @@
 package com.mekilah.codepath.todo;
 
 import android.content.Intent;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -18,7 +19,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends ActionBarActivity implements AddOrEditFragment.AddOrEditFragmentAcceptedListener {
     private final int MY_RESULT_CODE = 42;
 
     ListView lvItems;
@@ -93,10 +94,14 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public void onAddItem(View v){
-        EditText et = (EditText) findViewById(R.id.etNewItem);
+        /*EditText et = (EditText) findViewById(R.id.etNewItem);
         itemsAdapter.add(et.getText().toString());
         et.setText("");
-        writeFile();
+        writeFile();*/
+
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        AddOrEditFragment addFragment = AddOrEditFragment.newInstance("Add new Todo item");
+        addFragment.show(fragmentManager, "fragment_add");
     }
 
     private void readFile(){
@@ -117,5 +122,11 @@ public class MainActivity extends ActionBarActivity {
         }catch(IOException e){
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void onAcceptPressedInAddOrEditFragment(AddOrEditFragment.AddOrEditFragmentData data) {
+        itemsAdapter.add(data.name);
+        writeFile();
     }
 }

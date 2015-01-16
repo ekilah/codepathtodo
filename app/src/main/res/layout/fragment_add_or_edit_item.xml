@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/llAddOrEditLinearLayout"
+    android:orientation="vertical"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center" >
+
+    <EditText
+    android:id="@+id/etFragAddOrEditItemName"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:inputType="text"
+    android:imeOptions="actionSend"
+    android:hint="Enter title here"
+    android:editable="true"
+    android:clickable="false"
+    android:enabled="true"
+    android:layout_alignParentTop="true"
+    android:layout_centerHorizontal="true"
+    android:layout_alignRight="@+id/dpAddOrEditDatePicker"
+    android:layout_alignLeft="@+id/dpAddOrEditDatePicker"
+
+        />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Cancel"
+        android:id="@+id/btnCancel"
+        android:layout_below="@+id/dpAddOrEditDatePicker"
+        android:layout_alignLeft="@+id/dpAddOrEditDatePicker"
+        android:layout_toLeftOf="@+id/btnCancel"
+
+        />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Accept"
+        android:id="@+id/btnAccept"
+        android:layout_below="@+id/dpAddOrEditDatePicker"
+        android:layout_alignRight="@+id/dpAddOrEditDatePicker"
+        />
+
+    <DatePicker
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/dpAddOrEditDatePicker"
+        android:calendarViewShown="false"
+        android:datePickerMode="spinner"
+        android:clickable="true"
+        android:visibility="visible"
+        android:layout_below="@+id/etFragAddOrEditItemName"
+        android:layout_centerHorizontal="true"/>
+
+</RelativeLayout>
