@@ -1,30 +1,71 @@
 package com.mekilah.codepath.todo;
 
+import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.InputMismatchException;
+import java.util.List;
+import java.util.zip.Inflater;
 
 
 public class MainActivity extends ActionBarActivity implements AddOrEditFragment.AddOrEditFragmentAcceptedListener {
     private final int MY_RESULT_CODE = 42;
 
     ListView lvItems;
-    ArrayList<String> items;
-    ArrayAdapter<String> itemsAdapter;
+    ArrayList<AddOrEditFragment.AddOrEditFragmentData> items;
+    TodoListDataAdapter itemsAdapter;
+
+    public class TodoListDataAdapter extends ArrayAdapter<AddOrEditFragment.AddOrEditFragmentData>{
+
+        private class ViewHolder{
+            TextView tvMaintext;
+            TextView tvSubtext;
+        }
+
+        public TodoListDataAdapter(Context context, List<AddOrEditFragment.AddOrEditFragmentData> objects) {
+            super(context, 0, objects);
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            AddOrEditFragment.AddOrEditFragmentData data = getItem(position);
+            ViewHolder viewHolder;
+
+            if(convertView==null){
+                convertView =  LayoutInflater.from(getContext()).inflate(R.layout.item_add_or_edit, parent, false);
+                viewHolder = new ViewHolder();
+                viewHolder.tvMaintext = (TextView) convertView.findViewById(R.id.tvItemMaintext);
+                viewHolder.tvSubtext = (TextView) convertView.findViewById(R.id.tvItemSubtext);
+                convertView.setTag(viewHolder);
+            }else{
+                viewHolder = (ViewHolder) convertView.getTag();
+            }
+
+            viewHolder.tvSubtext.setText(data.dateString);
+            viewHolder.tvMaintext.setText(data.name);
+
+            return convertView;
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,7 +74,7 @@ public class MainActivity extends ActionBarActivity implements AddOrEditFragment
 
         lvItems = (ListView) findViewById(R.id.lvItems);
         readFile();
-        itemsAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, items);
+        itemsAdapter = new TodoListDataAdapter(this, items);
 
         lvItems.setAdapter(itemsAdapter);
 
@@ -52,23 +93,9 @@ public class MainActivity extends ActionBarActivity implements AddOrEditFragment
 
         this.lvItems.setOnItemClickListener( new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent i = new Intent(MainActivity.this, EditActivity.class);
-                i.putExtra("pos", position);
-                i.putExtra("text", items.get(position));
-                startActivityForResult(i, MY_RESULT_CODE);
+
             }
         });
-    }
-
-    public void onActivityResult(int requestCode, int resultCode, Intent data){
-        if(requestCode == this.MY_RESULT_CODE){
-            if(resultCode == RESULT_OK){
-                int position = data.getExtras().getInt("pos", -1);
-                items.set(position, data.getExtras().getString("text").toString());
-                itemsAdapter.notifyDataSetChanged();
-                writeFile();
-            }
-        }
     }
 
     @Override
@@ -94,11 +121,6 @@ public class MainActivity extends ActionBarActivity implements AddOrEditFragment
     }
 
     public void onAddItem(View v){
-        /*EditText et = (EditText) findViewById(R.id.etNewItem);
-        itemsAdapter.add(et.getText().toString());
-        et.setText("");
-        writeFile();*/
-
         FragmentManager fragmentManager = getSupportFragmentManager();
         AddOrEditFragment addFragment = AddOrEditFragment.newInstance("Add new Todo item");
         addFragment.show(fragmentManager, "fragment_add");
@@ -108,16 +130,34 @@ public class MainActivity extends ActionBarActivity implements AddOrEditFragment
         File file = new File(getFilesDir(), "todo.txt");
 
         try{
-            items = new ArrayList<String>(FileUtils.readLines(file));
+            ArrayList<String> strings = new ArrayList<String>(FileUtils.readLines(file));
+            items = new ArrayList<AddOrEditFragment.AddOrEditFragmentData>();
+            for(String s : strings){
+                int pos = s.lastIndexOf(" ");
+                AddOrEditFragment.AddOrEditFragmentData data = new AddOrEditFragment.AddOrEditFragmentData();
+                Log.w("read", "position of last space: " + pos + ". string length: " + s.length());
+                boolean success = data.setDateFromString(s.substring(pos+1 /*don't include space*/));
+
+                if(!success){
+                    throw new InputMismatchException("String did not parse properly: " + s);
+                }
+
+                data.name = s.substring(0, pos);
+                items.add(data);
+            }
+
         }catch(Exception e){
-            items = new ArrayList<String>();
+            e.printStackTrace();
+            Log.e("err", "file read failed.", e);
+            items = new ArrayList<AddOrEditFragment.AddOrEditFragmentData>();
+            //writeFile();
         }
     }
 
     private void writeFile(){
         File file = new File(getFilesDir(), "todo.txt");
 
-        try {
+       try {
             FileUtils.writeLines(file, items);
         }catch(IOException e){
             e.printStackTrace();
@@ -126,7 +166,7 @@ public class MainActivity extends ActionBarActivity implements AddOrEditFragment
 
     @Override
     public void onAcceptPressedInAddOrEditFragment(AddOrEditFragment.AddOrEditFragmentData data) {
-        itemsAdapter.add(data.name);
+        itemsAdapter.add(data);
         writeFile();
     }
 }

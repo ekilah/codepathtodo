@@ -10,6 +10,8 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 
 import java.io.Serializable;
+import java.text.DateFormat;
+import java.util.IllegalFormatException;
 
 /**
  * Created by mekilah on 1/15/15.
@@ -21,18 +23,68 @@ public class AddOrEditFragment extends DialogFragment {
         public void onAcceptPressedInAddOrEditFragment(AddOrEditFragmentData data);
     }
 
-    public class AddOrEditFragmentData implements Serializable{
+    public static class AddOrEditFragmentData implements Serializable{
         public String name;
-        public int year;
-        public int month;
-        public int dayOfMonth;
+        private int year;
+        private int month;
+        private int dayOfMonth;
+        public String dateString;
+
+        @Override
+        public String toString() {
+            return name + " " + dateString;
+        }
+
+        public void setDateFromData(int year, int month, int day){
+            this.year=year;
+            this.month=month;
+            this.dayOfMonth=day;
+
+            StringBuilder sb = new StringBuilder();
+            sb.append(this.year);
+            sb.append('/');
+
+            if(this.month < 10){
+                sb.append('0');
+            }
+
+            sb.append(this.month);
+
+            sb.append('/');
+
+            if(this.dayOfMonth < 10){
+                sb.append('0');
+            }
+
+            sb.append(this.dayOfMonth);
+
+            this.dateString = sb.toString();
+        }
+
+        //assumes string is "YYYY/MM/DD"
+        public boolean setDateFromString(String s){
+            String[] strs = s.split("/");
+            if(strs.length != 3){
+                return false;
+            }
+            try {
+                this.year = Integer.parseInt(strs[0].toString());
+                this.month = Integer.parseInt(strs[1].toString());
+                this.dayOfMonth = Integer.parseInt(strs[2].toString());
+            }catch (NumberFormatException e){
+                e.printStackTrace();
+                return false;
+            }
+            this.dateString = s;
+            return true;
+        }
 
         public AddOrEditFragmentData(){}
         public AddOrEditFragmentData(String n, DatePicker datePicker){
             this.name = n;
-            this.year = datePicker.getYear();
-            this.month = datePicker.getMonth();
-            this.dayOfMonth = datePicker.getDayOfMonth();
+
+            //date picker's month is [0,11]
+            this.setDateFromData(datePicker.getYear(), datePicker.getMonth() + 1, datePicker.getDayOfMonth());
         }
 
     }
