@@ -13,8 +13,17 @@ As of `c3ce3e1671e1cd2a0b19787a2db26d46fbf34004` the required sections are compl
   - [x] readme
   - [x] gif
   - [x] issue
+  
 
-I will add to this project before the training as I have free time (if/when!)
+However, this is the most recent update on `master`: `b3cc5cbd4ffc44e6cfd09f2a348492a92f6a9747`
+
+New features:
+- Fragment for adding and editing instead of text box at bottom
+- Date picker in fragment
+- Custom list adapter for custom list UI (for date)
+
+
+I will add _more_ to this project before the training as I have free time (if/when!)
 
 
 ##Demo time!
